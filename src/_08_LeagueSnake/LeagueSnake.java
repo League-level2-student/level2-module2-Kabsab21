@@ -20,10 +20,6 @@ public class LeagueSnake extends PApplet {
     int foody;
     int direction = UP;
     int eaten = 0;
-    int snakex = 250;
-    int snakey = 250;
-    int tailx = 250;
-    int taily = 240;
     ArrayList <Segment> segments = new ArrayList<Segment>();
    
     /*
@@ -38,15 +34,15 @@ public class LeagueSnake extends PApplet {
 
     @Override
     public void setup() {
-        head = new Segment(snakex, snakey);
+        head = new Segment(250, 250);
         frameRate(10);
         dropFood();
     }
 
     void dropFood() {
         // Set the food in a new random location
-    	foodx = ((int)random(50)*10);
-    	foody = ((int)random(50)*10);
+    	foodx = ((int)(random(48)+1)*10);
+    	foody = ((int)(random(48)+1)*10);
     }
 
     /*
@@ -62,7 +58,7 @@ public class LeagueSnake extends PApplet {
         drawFood();
         drawSnake();
         manageTail();
-        checkTailCollision();
+      
         drawTail();
         eat();
     }
@@ -76,7 +72,7 @@ public class LeagueSnake extends PApplet {
     void drawSnake() {
         // Draw the head of the snake followed by its tail
     	fill(0, 200, 50);
-    	 rect(snakex, snakey, 10,10);
+    	 rect(head.x, head.y, 10,10);
     }
 
     void drawTail() {
@@ -102,28 +98,30 @@ public class LeagueSnake extends PApplet {
         // After drawing the tail, add a new segment at the "start" of the tail and
         // remove the one at the "end"
         // This produces the illusion of the snake tail moving.
-    	
+    	checkTailCollision();
     	drawTail();
     	fill(0, 200, 50);
     	
 //    	segments.set(0,new Segment(tailx, taily));
-//    	
+    	segments.remove(head);
 //	   segments.remove(segments.size() - 1);
     	
-    	segments.add(new Segment(snakex, snakey));
+    	segments.add(new Segment(head.x, head.y));
+    	while( segments.size() > eaten) {
     	segments.remove(0);
-    	checkTailCollision();
+    	}
 
     }
 
     void checkTailCollision() {
         // If the snake crosses its own tail, shrink the tail back to one segment
-    	for(Segment s : segments) {
+    	
+    	for(Segment s : segments){
     		if( head.x == s.x && head.y == s.y) {
-    		
+    	
     			eaten = 1;
     			segments = new ArrayList<Segment>();
-    			// segments.add( new Segment(head.x, head.y));
+    		 segments.add( new Segment(head.x, head.y));
     		}
     	}
     }
@@ -156,23 +154,22 @@ public class LeagueSnake extends PApplet {
         
         if (direction == UP) {
             // Move head up
-        	snakey = snakey - 10;
-        	taily = taily - 10;
+        	head.y = head.y - 10;
+        	
             checkBoundaries();
         } else if (direction == DOWN) {
             // Move head down
-        	snakey= snakey + 10;
-        	taily= taily + 10;
+        	head.y= head.y + 10;
+        
         	   checkBoundaries();
                 
         } else if (direction == LEFT) {
-        	snakex= snakex- 10;
-        	tailx= tailx- 10;
+        	head.x= head.x- 10;
         	   checkBoundaries();
             
         } else if (direction == RIGHT) {
-        	snakex= snakex + 10;
-        	tailx= tailx+ 10;
+        	head.x= head.x + 10;
+        
         	   checkBoundaries();
         }
         
@@ -180,31 +177,31 @@ public class LeagueSnake extends PApplet {
 
     void checkBoundaries() {
         // If the snake leaves the frame, make it reappear on the other side
-        if(snakex >= 500) {
-        	snakex = 0;
-        	tailx = 0;
-        }else if( snakex <= 0) {
-        	snakex = 500;
-        	tailx = 500;
+        if(head.x > 500) {
+        	head.x = 0;
+        
+        }else if( head.x < 0) {
+        	head.x = 500;
+        	
         }
         
-        if(snakey >= 500 ) {
-        	snakey = 0;
-        	taily = 0;
-        }else if( snakey <= 0) {
-        	snakey = 500;
-        	taily = 500;
+        if(head.y > 500 ) {
+        	head.y = 0;
+        	
+        }else if( head.y < 0) {
+        	head.y = 500;
+        	
         }
     }
 
     void eat() {
         // When the snake eats the food, its tail should grow and more
         // food appear
-    	if( snakex == foodx && snakey == foody) {
+    	if( head.x == foodx && head.y == foody) {
     		
     		eaten = eaten + 1;
     		dropFood();
-    		segments.add(new Segment(tailx, taily));
+    		segments.add(new Segment(head.x, head.y));
     	}
         
     }
